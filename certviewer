@@ -1,0 +1,28 @@
+function certviewer() {
+  if [ "${1}" = "crt" ]; then
+    openssl x509 -text -noout -in $2
+  elif [ "${1}" = "check" ]; then
+    if [ $# -eq 3 ]; then
+      openssl x509 -noout -modulus -in $2 | openssl md5
+      openssl rsa -noout -modulus -in $3 | openssl md5
+    fi
+  else
+    printf "bad arguments number"
+  fi
+}
+
+_certviewer() {
+  local state
+  _arguments \
+    '1:test1:->option'\
+    '2:test2:->path'\
+    '3:test3:->path'
+
+  case $state in
+    (option) _describe 'command' "('crt:Display certificate informations' 'check:Check if certificate and key are paired')";;
+    (path) _files;;
+  esac
+
+}
+
+compdef _certviewer certviewer
